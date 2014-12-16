@@ -1,0 +1,12 @@
+{application, gridlock,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { gridlock_app, []}},
+  {env, []}
+ ]}.
