@@ -24,7 +24,10 @@ start(_StartType, _StartArgs) ->
 
     io:format("Building Route Table...~n"),
     Dispatch = cowboy_router:compile([
-      {'_', [{'_', gridlock_web_server, []}]}
+      {'_', [
+        {"/", cowboy_static, {file, "assets/index.html"}},
+        {'_', gridlock_web_server, []}
+      ]}
     ]),
 
     io:format("Starting HTTP...~n"),
