@@ -2,3 +2,5 @@ deps/
 .rebar/
 *.swp
 ebin/
+*.beam
+
