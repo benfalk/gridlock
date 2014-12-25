@@ -7,17 +7,22 @@
 -type has_bomb() :: false | true.
 -type grid() :: {point(), status(), has_bomb(), surrounding_bombs()}.
 
--export([build/1, list_upto/1]).
+-export([build/1]).
 
 build(Size) ->
-  List = list_upto(Size),
+  List = lists:seq(1,Size),
   Matrix = [{{X, Y}, covered, false, 0} || X <- List, Y <- List],
   {gridlock_grid, Matrix}.
 
-list_upto(Size) ->
-  list_upto(0, Size, []).
+%bomb_list(Size) ->
+  %Total = Size * Size,
+  %Bombs = Total div 4,
+  %shuffle(bombs(Bombs) ++ no_bombs(Total-Bombs)).
 
-list_upto(Size, Size, List) ->
-  lists:reverse(List);
-list_upto(Current, Max, List) ->
-  list_upto(Current + 1, Max, [Current + 1 | List]).
+shuffle(List) ->
+  shuffle(List, []).
+shuffle([], Acc) ->
+  Acc;
+shuffle(List, Acc) ->
+  {Leading, [H | T]} = lists:split(random:uniform(length(List)) - 1, List),
+  shuffle(Leading ++ T, [H | Acc]).
