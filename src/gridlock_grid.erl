@@ -8,13 +8,14 @@
 -type has_bomb() :: false | true.
 -type grid() :: {point(), status(), has_bomb(), surrounding_bombs()}.
 
--export([build/1, fill_with/2, bomb_list/1]).
+-export([build/1]).
 
 build(Size) ->
   List = lists:seq(1,Size),
   Matrix = [{X, Y} || X <- List, Y <- List],
   Bombs = bomb_list(Size),
-  {gridlock_grid, Size, merge(Matrix, Bombs, [])}.
+  Uncounted = {gridlock_grid, Size, merge(Matrix, Bombs, [])},
+  count_squares(Uncounted).
 
 bomb_list(Size) ->
   Total = Size * Size,
@@ -40,3 +41,12 @@ merge([],[],List) ->
   lists:reverse(List);
 merge([Hm|Tm] = _Matrix, [Hb|Tb] = _Bombs, List) ->
   merge(Tm, Tb, [{Hm, covered, Hb, 0}|List]).
+
+count_squares({gridlock_grid,Size,Matrix}) ->
+  {gridlock_grid,Size,count_squares([],Matrix,Matrix)}.
+count_squares(Acc,_,[]) ->
+  lists:reverse(Acc);
+count_squares(Acc,Matrix,[H|T]) ->
+  {{X,Y},Status,HasBomb,_Surrounding} = H,
+  Bombs = [Bomb || Bomb = {{X1,Y1},_,true,_} <- Matrix, X1 > X-2, X1 < X+2, Y1 > Y-2, Y1 < Y+2],
+  count_squares([{{X,Y},Status,HasBomb,length(Bombs)}|Acc], Matrix, T).
