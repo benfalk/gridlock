@@ -8,7 +8,7 @@
 -type has_bomb() :: false | true.
 -type grid() :: {point(), status(), has_bomb(), surrounding_bombs()}.
 
--export([build/1]).
+-export([build/1, flag/2]).
 
 build(Size) ->
   List = lists:seq(1,Size),
@@ -16,6 +16,13 @@ build(Size) ->
   Bombs = bomb_list(Size),
   Uncounted = {gridlock_grid, Size, merge(Matrix, Bombs, [])},
   count_squares(Uncounted).
+
+flag({X,Y}, {gridlock_grid, Size, Matrix}) ->
+  {gridlock_grid, Size, flag(Matrix, [], {X,Y})}.
+flag([],Acc,_) -> lists:reverse(Acc);
+flag([{{X,Y},_,HasBomb,Surrounding}|Tail], Acc, {X,Y}) ->
+  flag([],lists:reverse(Tail) ++ [{{X,Y},flagged,HasBomb,Surrounding}|Acc], {X,Y}); 
+flag([H|T], Acc, {X,Y}) -> flag(T, [H|Acc], {X,Y}).
 
 bomb_list(Size) ->
   Total = Size * Size,
