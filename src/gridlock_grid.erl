@@ -24,6 +24,16 @@ flag([{{X,Y},_,HasBomb,Surrounding}|Tail], Acc, {X,Y}) ->
   flag([],lists:reverse(Tail) ++ [{{X,Y},flagged,HasBomb,Surrounding}|Acc], {X,Y}); 
 flag([H|T], Acc, {X,Y}) -> flag(T, [H|Acc], {X,Y}).
 
+uncover({X,Y}, {gridlock_grid, Size, Matrix}) ->
+  {gridlock_grid, Size, uncover(Matrix, Matrix, [], {X,Y})}.
+uncover(_,[],Acc,_) -> lists:reverse(Acc);
+uncover(Matrix, [Head = {{X,Y},Status,HasBomb,Surrounding}|Tail], Acc, {X,Y}) ->
+  case Status of
+    covered -> if % ??
+    uncovered -> uncover(Matrix, [], lists:reverse(Tail) ++ [Head|Acc], {X,Y})
+  end;
+uncover(Matrix, [H|T], Acc, {X,Y}) -> uncover(Matrix, T, [H|Acc], {X,Y}).
+
 bomb_list(Size) ->
   Total = Size * Size,
   Bombs = Total div 4,
