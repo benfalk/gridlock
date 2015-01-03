@@ -8,7 +8,7 @@
 -type has_bomb() :: false | true.
 -type grid() :: {point(), status(), has_bomb(), surrounding_bombs()}.
 
--export([build/1, flag/2]).
+-export([build/1, flag/2, surrounding_grids/2]).
 
 build(Size) ->
   List = lists:seq(1,Size),
@@ -24,15 +24,10 @@ flag([{{X,Y},_,HasBomb,Surrounding}|Tail], Acc, {X,Y}) ->
   flag([],lists:reverse(Tail) ++ [{{X,Y},flagged,HasBomb,Surrounding}|Acc], {X,Y}); 
 flag([H|T], Acc, {X,Y}) -> flag(T, [H|Acc], {X,Y}).
 
-uncover({X,Y}, {gridlock_grid, Size, Matrix}) ->
-  {gridlock_grid, Size, uncover(Matrix, Matrix, [], {X,Y})}.
-uncover(_,[],Acc,_) -> lists:reverse(Acc);
-uncover(Matrix, [Head = {{X,Y},Status,HasBomb,Surrounding}|Tail], Acc, {X,Y}) ->
-  case Status of
-    covered -> if % ??
-    uncovered -> uncover(Matrix, [], lists:reverse(Tail) ++ [Head|Acc], {X,Y})
-  end;
-uncover(Matrix, [H|T], Acc, {X,Y}) -> uncover(Matrix, T, [H|Acc], {X,Y}).
+surrounding_grids({X,Y}, {gridlock_grid, Size, _}) ->
+  Over = Size + 1,
+  Raw = [{X+X1,Y+Y1} || X1 <- lists:seq(-1,1), Y1 <- lists:seq(-1,1)],
+  lists:delete({X,Y}, [{X2,Y2} || {X2,Y2} <- Raw, X2 > 0, Y2 > 0, X2 < Over, Y2 < Over]).
 
 bomb_list(Size) ->
   Total = Size * Size,
