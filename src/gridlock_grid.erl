@@ -20,15 +20,14 @@ build(Size) ->
 update({X,Y}, State, {gridlock_grid, Size, Matrix}) ->
   {gridlock_grid, Size, update(Matrix, [], {X,Y}, State)}.
 
-update([],Acc,_,_) -> lists:reverse(Acc);
-update([{{X,Y},_,HasBomb,Surrounding}|Tail], Acc, {X,Y}, State) ->
-  update([],lists:reverse(Tail) ++ [{{X,Y},State,HasBomb,Surrounding}|Acc], {X,Y}, State); 
-update([H|T], Acc, {X,Y}, State) -> update(T, [H|Acc], {X,Y}, State).
-
 surrounding_grids({X,Y}, {gridlock_grid, Size, _}) ->
   Over = Size + 1,
   Raw = [{X+X1,Y+Y1} || X1 <- lists:seq(-1,1), Y1 <- lists:seq(-1,1)],
   lists:delete({X,Y}, [{X2,Y2} || {X2,Y2} <- Raw, X2 > 0, Y2 > 0, X2 < Over, Y2 < Over]).
+
+%%--------------------------------------------------------------------------------------------
+%%                                     Private Methods
+%%--------------------------------------------------------------------------------------------
 
 bomb_list(Size) ->
   Total = Size * Size,
@@ -63,3 +62,8 @@ count_squares(Acc,Matrix,[H|T]) ->
   {{X,Y},Status,HasBomb,_Surrounding} = H,
   Bombs = [Bomb || Bomb = {{X1,Y1},_,true,_} <- Matrix, X1 > X-2, X1 < X+2, Y1 > Y-2, Y1 < Y+2],
   count_squares([{{X,Y},Status,HasBomb,length(Bombs)}|Acc], Matrix, T).
+
+update([],Acc,_,_) -> lists:reverse(Acc);
+update([{{X,Y},_,HasBomb,Surrounding}|Tail], Acc, {X,Y}, State) ->
+  update([],lists:reverse(Tail) ++ [{{X,Y},State,HasBomb,Surrounding}|Acc], {X,Y}, State); 
+update([H|T], Acc, {X,Y}, State) -> update(T, [H|Acc], {X,Y}, State).
