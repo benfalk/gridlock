@@ -8,7 +8,7 @@
 -type has_bomb() :: false | true.
 -type grid() :: {point(), status(), has_bomb(), surrounding_bombs()}.
 
--export([build/1, flag/2, surrounding_grids/2]).
+-export([build/1, update/3, surrounding_grids/2]).
 
 build(Size) ->
   List = lists:seq(1,Size),
@@ -17,12 +17,13 @@ build(Size) ->
   Uncounted = {gridlock_grid, Size, merge(Matrix, Bombs, [])},
   count_squares(Uncounted).
 
-flag({X,Y}, {gridlock_grid, Size, Matrix}) ->
-  {gridlock_grid, Size, flag(Matrix, [], {X,Y})}.
-flag([],Acc,_) -> lists:reverse(Acc);
-flag([{{X,Y},_,HasBomb,Surrounding}|Tail], Acc, {X,Y}) ->
-  flag([],lists:reverse(Tail) ++ [{{X,Y},flagged,HasBomb,Surrounding}|Acc], {X,Y}); 
-flag([H|T], Acc, {X,Y}) -> flag(T, [H|Acc], {X,Y}).
+update({X,Y}, State, {gridlock_grid, Size, Matrix}) ->
+  {gridlock_grid, Size, update(Matrix, [], {X,Y}, State)}.
+
+update([],Acc,_,_) -> lists:reverse(Acc);
+update([{{X,Y},_,HasBomb,Surrounding}|Tail], Acc, {X,Y}, State) ->
+  update([],lists:reverse(Tail) ++ [{{X,Y},State,HasBomb,Surrounding}|Acc], {X,Y}, State); 
+update([H|T], Acc, {X,Y}, State) -> update(T, [H|Acc], {X,Y}, State).
 
 surrounding_grids({X,Y}, {gridlock_grid, Size, _}) ->
   Over = Size + 1,
