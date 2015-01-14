@@ -1,20 +1,20 @@
 -module(gridlock_game).
 
--export([start/1,rpc/2]).
+-export([start/1,rpc/2,rpc/3]).
 
 start(Size) ->
   Grid = gridlock_grid:build(Size),
   spawn(fun()-> loop(Grid) end).
 
 rpc(Game, Method, Args) ->
-  Game ! {self(), Method, Args}
+  Game ! {self(), Method, Args},
   receive
     {Game, Msg} -> Msg;
     Unkown      -> io:format("Unkown msg [~p]~n", [Unkown])
   end.
 
 rpc(Game, Method) ->
-  Game ! {self(), Method}
+  Game ! {self(), Method},
   receive
     {Game, Msg} -> Msg;
     Unkown      -> io:format("Unkown msg [~p]~n", [Unkown])
