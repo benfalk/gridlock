@@ -42,8 +42,21 @@ surrounding_locations_test() ->
 plant_bombs_test() ->
   Grid = gridlock_grid:build(5),
   #{size:= 5, squares := Squares} = gridlock_grid:plant_bombs(Grid, 5),
+
+  % Count up all the bombs
   Bombs = maps:fold(fun(_,#{has_bomb := B}, Ammount) -> case B of
                                                           true -> Ammount + 1;
                                                           false -> Ammount
                                                         end end, 0, Squares),
-  ?assertMatch(5, Bombs).
+  ?assertMatch(5, Bombs),
+  ?assertMatch(#{{5,5} := _ }, Squares),
+  ?assertMatch(#{{1,1} := _ }, Squares).
+
+count_bombs_test() ->
+  G = gridlock_grid:build(5),
+  Grid = gridlock_grid:plant_bombs(G, 5),
+  #{ squares := Squares } = gridlock_grid:count_bombs(Grid),
+  WithAmount = maps:fold(fun(_, #{surrounding_bombs := 0}, Ammount) -> Ammount;
+                            (_, #{surrounding_bombs := _}, Ammount) -> Ammount +1
+                         end, 0, Squares),
+  ?assertMatch(X when X > 0, WithAmount).
