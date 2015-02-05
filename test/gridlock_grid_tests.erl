@@ -1,6 +1,23 @@
 -module(gridlock_grid_tests).
 -include_lib("eunit/include/eunit.hrl").
 
+grid_structure() ->
+  #{size => 3,
+    squares => #{
+      {1,1} => square_structure(),     
+      {1,2} => square_structure(),     
+      {1,3} => square_structure(),      
+      {2,1} => square_structure(),      
+      {2,2} => square_structure(),      
+      {2,3} => square_structure(),      
+      {3,1} => square_structure(),      
+      {3,2} => square_structure(),      
+      {3,3} => square_structure()       
+    }
+  }.
+square_structure() ->
+  #{has_bomb => false, status => covered, surrounding_bombs => 0}.
+
 build_test() ->
   Grid = gridlock_grid:build(5),
   ?assertMatch(#{ size := 5}, Grid),
@@ -53,10 +70,14 @@ plant_bombs_test() ->
   ?assertMatch(#{{1,1} := _ }, Squares).
 
 count_bombs_test() ->
-  G = gridlock_grid:build(5),
-  Grid = gridlock_grid:plant_bombs(G, 5),
-  #{ squares := Squares } = gridlock_grid:count_bombs(Grid),
+  Grid = #{ squares := Squares } = grid_structure(),
+  Seeded = Grid#{ squares := maps:put({1,2}, maps:put(has_bomb, true, square_structure()), Squares)},
+  #{ squares := SeededSquares } = gridlock_grid:count_bombs(Seeded),
   WithAmount = maps:fold(fun(_, #{surrounding_bombs := 0}, Ammount) -> Ammount;
                             (_, #{surrounding_bombs := _}, Ammount) -> Ammount +1
-                         end, 0, Squares),
-  ?assertMatch(X when X > 0, WithAmount).
+                         end, 0, SeededSquares),
+  ?assertMatch(X when X > 0, WithAmount),
+  
+  CountedSquare = maps:get({1,1}, SeededSquares),
+  ?assertMatch(#{surrounding_bombs := 1}, CountedSquare).
+
