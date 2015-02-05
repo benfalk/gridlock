@@ -81,3 +81,8 @@ count_bombs_test() ->
   CountedSquare = maps:get({1,1}, SeededSquares),
   ?assertMatch(#{surrounding_bombs := 1}, CountedSquare).
 
+update_square_test() ->
+  Grid = grid_structure(),
+  { ok, Grid2 } = gridlock_grid:update_square(Grid, {1,2}, uncovered),
+  ?assertMatch(#{ status := uncovered}, gridlock_grid:square_at(Grid2, {1,2})).
+

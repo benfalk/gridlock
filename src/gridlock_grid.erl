@@ -5,7 +5,8 @@
   square_at/2,
   surrounding_locations/2,
   plant_bombs/2,
-  count_bombs/1
+  count_bombs/1,
+  update_square/3
 ]).
 
 build(Size) ->
@@ -40,6 +41,10 @@ count_bombs(Grid = #{ squares := Squares }) ->
     maps:put(L, S#{ surrounding_bombs := tally_bombs(Grid, L)}, A)
   end,
   Grid#{squares := maps:fold(CountBombs, Squares, Squares)}.
+
+update_square(Grid = #{ squares := Squares }, Location, Status) ->
+  Square = maps:put(status, Status, square_at(Grid, Location)),
+  { ok, Grid#{ squares := maps:put(Location, Square, Squares) } }.
 
 tally_bombs(Grid, L) ->
   maps:fold(fun(_,#{has_bomb := true}, Amount) -> Amount + 1;
