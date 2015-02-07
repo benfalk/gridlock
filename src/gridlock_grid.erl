@@ -6,12 +6,13 @@
   surrounding_locations/2,
   plant_bombs/2,
   count_bombs/1,
-  update_square/3
+  update_square/3,
+  squares/1
 ]).
 
 build(Size) ->
-  DefaultSquare = #{has_bomb => false, status => covered, surrounding_bombs => 0},
-  ProtoMap = [{{X,Y}, DefaultSquare} || X <- lists:seq(1,Size), Y <- lists:seq(1,Size)], 
+  DefaultSquare = #{has_bomb => false, status => covered, surrounding_bombs => 0, location => {0,0}},
+  ProtoMap = [{{X,Y}, DefaultSquare#{location := {X,Y}}} || X <- lists:seq(1,Size), Y <- lists:seq(1,Size)], 
   #{size => Size, squares => maps:from_list(ProtoMap)}.
 
 square_at(#{squares := Grid}, Location) when is_map(Grid), is_tuple(Location) ->
@@ -50,6 +51,9 @@ tally_bombs(Grid, L) ->
   maps:fold(fun(_,#{has_bomb := true}, Amount) -> Amount + 1;
                (_,#{has_bomb := false}, Amount) -> Amount
             end, 0, surrounding_locations(Grid, L)).
+
+squares(#{squares := Squares}) ->
+  maps:values(Squares).
 
 % Shuffle a list to randomize the order of the elements
 shuffle(L) ->

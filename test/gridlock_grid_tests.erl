@@ -16,7 +16,7 @@ grid_structure() ->
     }
   }.
 square_structure() ->
-  #{has_bomb => false, status => covered, surrounding_bombs => 0}.
+  #{has_bomb => false, status => covered, surrounding_bombs => 0, location => {0,0}}.
 
 build_test() ->
   Grid = gridlock_grid:build(5),
@@ -85,4 +85,12 @@ update_square_test() ->
   Grid = grid_structure(),
   { ok, Grid2 } = gridlock_grid:update_square(Grid, {1,2}, uncovered),
   ?assertMatch(#{ status := uncovered}, gridlock_grid:square_at(Grid2, {1,2})).
+
+squares_test() ->
+  Grid = grid_structure(),
+  Square = square_structure(),
+  ?assertMatch(X when is_list(X), gridlock_grid:squares(Grid)),
+  ?assertMatch(9, length(gridlock_grid:squares(Grid))),
+  ?assertMatch(Square, hd(gridlock_grid:squares(Grid))).
+
 
