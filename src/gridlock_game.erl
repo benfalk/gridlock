@@ -3,7 +3,9 @@
 -behaviour(gen_server).
 
 %% API functions
--export([new/1]).
+-export([new/1,
+         get_grid/1
+]).
 
 %% gen_server callbacks
 -export([init/1,
@@ -18,8 +20,11 @@
 %%%===================================================================
 
 new(Size) ->
-    {ok, GamePid} = gen_server:start_link({local, ?MODULE}, ?MODULE, [], []),
+    {ok, GamePid} = gen_server:start_link(?MODULE, Size, []),
     GamePid.
+
+get_grid(Game) ->
+  gen_server:call(Game, get_grid).
 
 %%%===================================================================
 %%% gen_server callbacks
@@ -36,8 +41,11 @@ new(Size) ->
 %%                     {stop, Reason}
 %% @end
 %%--------------------------------------------------------------------
-init([]) ->
-    {ok, sweet}.
+init(Size) ->
+    Grid = gridlock_grid:build(Size),
+    Grid2 = gridlock_grid:plant_bombs(Grid, (Size*Size) div 4),
+    Grid3 = gridlock_grid:count_bombs(Grid2),
+    {ok, #{grid =>Grid3}}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -53,6 +61,8 @@ init([]) ->
 %%                                   {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
+handle_call(get_grid, _From, State = #{grid := Grid}) ->
+  {reply, gridlock_grid:squares(Grid), State};
 handle_call(_Request, _From, State) ->
     Reply = ok,
     {reply, Reply, State}.
