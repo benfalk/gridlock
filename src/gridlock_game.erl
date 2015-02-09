@@ -4,7 +4,9 @@
 
 %% API functions
 -export([new/1,
-         get_grid/1
+         get_grid/1,
+         register_listener/2,
+         uncover_square/2
 ]).
 
 %% gen_server callbacks
@@ -25,6 +27,12 @@ new(Size) ->
 
 get_grid(Game) ->
   gen_server:call(Game, get_grid).
+
+register_listener(Game, Pid) ->
+  gen_server:call(Game, {register_listener, Pid}).
+
+uncover_square(Game, Location) ->
+  gen_server:call(Game, {uncover_square, Location}).
 
 %%%===================================================================
 %%% gen_server callbacks
@@ -63,6 +71,18 @@ init(Size) ->
 %%--------------------------------------------------------------------
 handle_call(get_grid, _From, State = #{grid := Grid}) ->
   {reply, gridlock_grid:squares(Grid), State};
+
+handle_call({register_listener, Pid}, _From, State) ->
+  % TODO: Need to register a listener here, gen_event deal I'm thinking
+  {reply, ok, State};
+
+handle_call({uncover_square, Location}, _From, State = #{grid := Grid}) ->
+  % TODO: Need to hook into a gen_event here?
+  case gridlock_grid:update_square(Grid, Location, uncovered) of
+    {ok, Updated}   -> {reply, ok, Updated};
+    {error, Reason} -> {reply, {error, Reason}, State}
+  end;
+
 handle_call(_Request, _From, State) ->
     Reply = ok,
     {reply, Reply, State}.
