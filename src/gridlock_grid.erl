@@ -44,8 +44,12 @@ count_bombs(Grid = #{ squares := Squares }) ->
   Grid#{squares := maps:fold(CountBombs, Squares, Squares)}.
 
 update_square(Grid = #{ squares := Squares, size := Size }, Location = {X,Y}, Status) when X > 0, Y > 0, X =< Size, Y =< Size ->
-  Square = maps:put(status, Status, square_at(Grid, Location)),
-  { ok, Grid#{ squares := maps:put(Location, Square, Squares) } };
+  #{status := OrginalStatus} = square_at(Grid, Location),
+  case {Status, OrginalStatus} of
+    {_, uncovered} -> { error, cannot_change_uncovered };
+                 _ -> Square = maps:put(status, Status, square_at(Grid, Location)),
+                      { ok, Grid#{ squares := maps:put(Location, Square, Squares) } }
+  end;
 update_square(_,_,_) -> { error, invalid_location }.
 
 tally_bombs(Grid, L) ->

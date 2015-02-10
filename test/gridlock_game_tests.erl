@@ -19,3 +19,7 @@ uncover_square_test() ->
   ?assertMatch({error, invalid_location}, gridlock_game:uncover_square(Game, {31,31})),
   ?assertMatch(ok, gridlock_game:uncover_square(Game, {4,12})).
   
+flag_square_test() ->
+  Game = gridlock_game:new(30),
+  ?assertMatch({error, invalid_location}, gridlock_game:flag_square(Game, {31,31})),
+  ?assertMatch(ok, gridlock_game:flag_square(Game, {4,12})).
