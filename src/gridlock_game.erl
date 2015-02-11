@@ -83,7 +83,7 @@ handle_call({register_listener, Pid}, _From, State) ->
 handle_call({update_square, Status, Location}, _From, State = #{grid := Grid}) ->
   % TODO: Need to hook into a gen_event here?
   case gridlock_grid:update_square(Grid, Location, Status) of
-    {ok, Updated}   -> {reply, ok, Updated};
+    {ok, Updated}   -> {reply, ok, State#{grid := Updated}};
     {error, Reason} -> {reply, {error, Reason}, State}
   end;
 
