@@ -7,7 +7,8 @@
          get_grid/1,
          register_listener/2,
          uncover_square/2,
-         flag_square/2
+         flag_square/2,
+         unflag_square/2
 ]).
 
 %% gen_server callbacks
@@ -37,6 +38,9 @@ uncover_square(Game, Location) ->
 
 flag_square(Game, Location) ->
   gen_server:call(Game, {update_square, flagged, Location}).
+
+unflag_square(Game, Location) ->
+  gen_server:call(Game, {update_square, covered, Location}).
 
 %%%===================================================================
 %%% gen_server callbacks
