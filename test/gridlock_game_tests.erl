@@ -12,7 +12,15 @@ get_grid_test() ->
 
 register_listener_test() ->
   Game = gridlock_game:new(30),
-  ?assertMatch(ok, gridlock_game:register_listener(Game, self())).
+  ?assertMatch(ok, gridlock_game:register_listener(Game, self())),
+  gridlock_game:flag_square(Game, {1,1}),
+  Msg =
+    receive
+      Any -> Any
+    after 10 ->
+      nope
+    end,
+  ?assertMatch({square_changed, #{ status := flagged, location := {1,1} }}, Msg).
 
 uncover_square_test() ->
   Game = gridlock_game:new(30),

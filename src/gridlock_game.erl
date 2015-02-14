@@ -61,7 +61,7 @@ init(Size) ->
     Grid = gridlock_grid:build(Size),
     Grid2 = gridlock_grid:plant_bombs(Grid, (Size*Size) div 4),
     Grid3 = gridlock_grid:count_bombs(Grid2),
-    EventHandler = gen_event:start_link(),
+    {ok, EventHandler} = gen_event:start_link(),
     {ok, #{grid => Grid3, event_handler => EventHandler}}.
 
 %%--------------------------------------------------------------------
@@ -81,14 +81,16 @@ init(Size) ->
 handle_call(get_grid, _From, State = #{grid := Grid}) ->
   {reply, gridlock_grid:squares(Grid), State};
 
-handle_call({register_listener, Pid}, _From, State) ->
-  % TODO: Need to register a listener here, gen_event deal I'm thinking
+handle_call({register_listener, Pid}, _From, State = #{ event_handler := EH }) ->
+  gridlock_listener:add_listener(EH, Pid),
   {reply, ok, State};
 
 handle_call({update_square, Status, Location}, _From, State = #{grid := Grid}) ->
-  % TODO: Need to hook into a gen_event here?
   case gridlock_grid:update_square(Grid, Location, Status) of
-    {ok, Updated}   -> {reply, ok, State#{grid := Updated}};
+    {ok, Updated}   -> 
+      Square = gridlock_grid:square_at(Updated, Location),
+      gen_event:notify(maps:get(event_handler, State), {square_changed, Square}),
+      {reply, ok, State#{grid := Updated}};
     {error, Reason} -> {reply, {error, Reason}, State}
   end;
 

@@ -3,8 +3,7 @@
 -behaviour(gen_event).
 
 %% API functions
--export([start_link/0,
-         add_handler/2]).
+-export([add_listener/2]).
 
 %% gen_event callbacks
 -export([init/1,
@@ -18,25 +17,10 @@
 %%% API functions
 %%%===================================================================
 
-%%--------------------------------------------------------------------
-%% @doc
-%% Creates an event manager
-%%
-%% @spec start_link() -> {ok, Pid} | {error, Error}
-%% @end
-%%--------------------------------------------------------------------
-start_link() ->
-    gen_event:start_link({local, ?MODULE}).
-
-%%--------------------------------------------------------------------
-%% @doc
-%% Adds an event handler
-%%
-%% @spec add_handler(Handler, Args) -> ok | {'EXIT', Reason} | term()
-%% @end
-%%--------------------------------------------------------------------
-add_handler(Handler, Args) ->
-    gen_event:add_handler(?MODULE, Handler, Args).
+add_listener(EventHandler, Pid) when is_pid(Pid) ->
+  Ref = make_ref(),
+  ok = gen_event:add_handler(EventHandler, {gridlock_listener, Ref}, [Pid]),
+  {ok, Ref}.
 
 %%%===================================================================
 %%% gen_event callbacks
@@ -51,7 +35,7 @@ add_handler(Handler, Args) ->
 %% @spec init(Args) -> {ok, State}
 %% @end
 %%--------------------------------------------------------------------
-init(Pid) ->
+init([Pid]) when is_pid(Pid) ->
     {ok, Pid}.
 
 %%--------------------------------------------------------------------
@@ -67,6 +51,10 @@ init(Pid) ->
 %%                          remove_handler
 %% @end
 %%--------------------------------------------------------------------
+handle_event({square_changed, Square}, Pid) ->
+  Pid ! {square_changed, Square},
+  {ok, Pid};
+
 handle_event(_Event, State) ->
     {ok, State}.
 
