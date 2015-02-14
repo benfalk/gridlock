@@ -61,7 +61,8 @@ init(Size) ->
     Grid = gridlock_grid:build(Size),
     Grid2 = gridlock_grid:plant_bombs(Grid, (Size*Size) div 4),
     Grid3 = gridlock_grid:count_bombs(Grid2),
-    {ok, #{grid =>Grid3}}.
+    EventHandler = gen_event:start_link(),
+    {ok, #{grid => Grid3, event_handler => EventHandler}}.
 
 %%--------------------------------------------------------------------
 %% @private
