@@ -26,6 +26,8 @@ start(_StartType, _StartArgs) ->
     Dispatch = cowboy_router:compile([
       {'_', [
         {"/", cowboy_static, {file, "assets/index.html"}},
+        {"/css/[...]", cowboy_static, {dir, "assets/css/"}},
+        {"/js/[...]", cowboy_static, {dir, "assets/js"}},
         {'_', gridlock_web_server, []}
       ]}
     ]),
