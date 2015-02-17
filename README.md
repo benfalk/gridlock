@@ -11,9 +11,5 @@ multiplayer mindesweeper project of "bombvacum"
 - rebar compile
 - the following in a terminal at the root of the project...
 ```
-erl -pa ./ebin \
--pa ./deps/cowboy/ebin/ \
--pa ./deps/cowlib/ebin/ \
--pa ./deps/ranch/ebin/
+./start_gridlock.sh
 ```
-- In the erlang shell `application:start(gridlock).`
