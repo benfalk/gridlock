@@ -27,6 +27,7 @@ start(_StartType, _StartArgs) ->
       {'_', [
         {"/", cowboy_static, {file, "assets/index.html"}},
         {"/css/[...]", cowboy_static, {dir, "assets/css/"}},
+        {"/js/bullet.js", cowboy_static, {priv_file, bullet, "bullet.js"}},
         {"/js/[...]", cowboy_static, {dir, "assets/js"}},
         {"/fonts/[...]", cowboy_static, {dir, "assets/fonts"}},
         {'_', gridlock_web_server, []}
