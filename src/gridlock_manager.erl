@@ -5,7 +5,8 @@
 %% API functions
 -export([
   start/0
-  ,create_grid/3
+  ,create_game/3
+  ,game_list/1
 ]).
 
 %% gen_server callbacks
@@ -24,8 +25,11 @@ start() ->
   {ok, ManagerPid} = gen_server:start_link(?MODULE, [], []),
   ManagerPid.
 
-create_grid(Manager, Name, Size) when is_pid(Manager), is_binary(Name), is_integer(Size) ->
-  gen_server:call(Manager, {create_grid, #{name => Name, size => Size}}).
+create_game(Manager, Name, Size) when is_pid(Manager), is_binary(Name), is_integer(Size) ->
+  gen_server:call(Manager, {create_game, #{name => Name, size => Size}}).
+
+game_list(Manager) ->
+  gen_server:call(Manager, game_list).
 
 %register(ManagerPid, Pid) ->
   
@@ -62,13 +66,16 @@ init(_State) ->
 %%                                   {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
-handle_call({create_grid, #{name := Name, size := Size}}, _From, State = #{ grids := Grids }) ->
+handle_call({create_game, #{name := Name, size := Size}}, _From, State = #{ grids := Grids }) ->
   case maps:is_key(Name, Grids) of
     true -> {reply, {error, already_exists}, State};
     false -> AddedGrid = maps:put(Name, gridlock_game:new(Size), Grids),
              %% TODO Probably have a game created event here?
              {reply, ok, State#{ grids := AddedGrid }}
   end;
+
+handle_call(game_list, _From, State = #{ grids := Grids }) ->
+  {reply, maps:keys(Grids), State};
 
 handle_call(_Request, _From, State) ->
   Reply = ok,

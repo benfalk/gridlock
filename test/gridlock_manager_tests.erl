@@ -5,10 +5,15 @@ start_test() ->
   Manager = gridlock_manager:start(),
   ?assertMatch(X when is_pid(X), Manager).
 
-create_grid_test() ->
+create_game_test() ->
   Manager = gridlock_manager:start(),
-  ?assertMatch(ok, gridlock_manager:create_grid(Manager, <<"My Grid">>, 50)),
-  ?assertMatch({error, already_exists}, gridlock_manager:create_grid(Manager, <<"My Grid">>, 50)).
+  ?assertMatch(ok, gridlock_manager:create_game(Manager, <<"My Grid">>, 50)),
+  ?assertMatch({error, already_exists}, gridlock_manager:create_game(Manager, <<"My Grid">>, 50)).
+
+game_list_test() ->
+  Manager = gridlock_manager:start(),
+  ok = gridlock_manager:create_game(Manager, <<"My Grid">>, 50),
+  ?assertMatch([<<"My Grid">>], gridlock_manager:game_list(Manager)).
 
 %register_test() ->
   %Manager = gridlock_manager:start(),

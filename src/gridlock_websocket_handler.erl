@@ -12,13 +12,17 @@ init(Transport, Req, Opts, Active) ->
     "INIT:~n--Transport: ~p~n--Req: ~p~n--Opts: ~p~n--Active:~p~n",
     [Transport, Req, Opts, Active]
   ),
-  {ok, Req, []}.
+  Manager = maps:get(manager, maps:from_list(Opts)),
+  {ok, Req, Manager}.
 
 stream(<<"ping">>, Req, State) ->
   {reply, <<"pong">>, Req, State};
 stream(Data, Req, State) ->
+  Map = jsx:decode(Data,[return_maps, {labels, atom}]),
   io:format("Stream Received:  ~p~n", [Data]),
-  {ok, Req, [Data|State]}.
+  io:format("Data Transformed: ~p~n", [Map]),
+  io:format("State: ~p~n", [State]),
+  handle_event(Map, Req, State).
 
 info(Info, Req, State) ->
   io:format("Info Received: ~p~n", [Info]),
@@ -30,3 +34,16 @@ terminate(Req, State) ->
     [Req, State]
   ),
   ok.
+
+%%%===================================================================
+%%% Internal API Handling
+%%%===================================================================
+
+handle_event(#{ event := <<"create_game">>, name := Name, size := Size}, Req, Manager) ->
+  case gridlock_manager:create_game(Manager, Name, Size) of
+    ok -> {ok, Req, Manager};
+    {error, Reason} -> {reply, jsx:encode(#{event => <<"create_game_failed">>, reason => Reason}), Req, Manager}
+  end;
+
+handle_event(Unkown, Req, Manager) ->
+  {reply, jsx:encode(#{ event => <<"invalid">>, data => Unkown}), Req, Manager}.

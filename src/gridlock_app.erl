@@ -30,7 +30,10 @@ start(_StartType, _StartArgs) ->
         {"/js/bullet.js", cowboy_static, {priv_file, bullet, "bullet.js"}},
         {"/js/[...]", cowboy_static, {dir, "assets/js"}},
         {"/fonts/[...]", cowboy_static, {dir, "assets/fonts"}},
-        {"/gridlock", bullet_handler, [{handler, gridlock_websocket_handler},{games, #{}}]}
+        {"/gridlock", bullet_handler, [
+          {handler, gridlock_websocket_handler},
+          {manager, gridlock_manager:start()}
+        ]}
       ]}
     ]),
 
