@@ -55,8 +55,9 @@ handle_event({square_changed, Square}, Pid) ->
   Pid ! {square_changed, Square},
   {ok, Pid};
 
-handle_event(_Event, State) ->
-    {ok, State}.
+handle_event(Event, Pid) ->
+    Pid ! Event,
+    {ok, Pid}.
 
 %%--------------------------------------------------------------------
 %% @private

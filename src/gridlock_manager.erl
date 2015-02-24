@@ -7,6 +7,7 @@
   start/0
   ,create_game/3
   ,game_list/1
+  ,register/2
 ]).
 
 %% gen_server callbacks
@@ -31,7 +32,8 @@ create_game(Manager, Name, Size) when is_pid(Manager), is_binary(Name), is_integ
 game_list(Manager) ->
   gen_server:call(Manager, game_list).
 
-%register(ManagerPid, Pid) ->
+register(Manager, Pid) ->
+  gen_server:call(Manager, {register, Pid}).
   
 
 %%%===================================================================
@@ -50,7 +52,8 @@ game_list(Manager) ->
 %% @end
 %%--------------------------------------------------------------------
 init(_State) ->
-  {ok, #{grids => #{}}}.
+  {ok, EventListener} = gen_event:start_link(),
+  {ok, #{grids => #{}, event_listener => EventListener}}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -66,11 +69,15 @@ init(_State) ->
 %%                                   {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
-handle_call({create_game, #{name := Name, size := Size}}, _From, State = #{ grids := Grids }) ->
+handle_call({register, Pid}, _From, State = #{ event_listener := EventListener }) ->
+  Val = gridlock_listener:add_listener(EventListener, Pid),
+  {reply, Val, State};
+
+handle_call({create_game, GameData = #{name := Name, size := Size}}, _From, State = #{ grids := Grids }) ->
   case maps:is_key(Name, Grids) of
     true -> {reply, {error, already_exists}, State};
     false -> AddedGrid = maps:put(Name, gridlock_game:new(Size), Grids),
-             %% TODO Probably have a game created event here?
+             notify_event(State, game_created, GameData),
              {reply, ok, State#{ grids := AddedGrid }}
   end;
 
@@ -135,3 +142,8 @@ code_change(_OldVsn, State, _Extra) ->
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
+notify_event(State, EventName, Data) when is_map(Data), is_atom(EventName) ->
+  notify(State, maps:put(event, EventName, Data)).
+
+notify(#{ event_listener := EventListener}, Msg) ->
+  gen_event:notify(EventListener, Msg).

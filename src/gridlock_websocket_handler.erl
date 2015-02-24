@@ -13,6 +13,7 @@ init(Transport, Req, Opts, Active) ->
     [Transport, Req, Opts, Active]
   ),
   Manager = maps:get(manager, maps:from_list(Opts)),
+  gridlock_manager:register(Manager, self()),
   {ok, Req, Manager}.
 
 stream(<<"ping">>, Req, State) ->
@@ -24,6 +25,10 @@ stream(Data, Req, State) ->
   io:format("State: ~p~n", [State]),
   handle_event(Map, Req, State).
 
+info(Info = #{ event := _ }, Req, State) ->
+  io:format("Info Received: ~p~n", [Info]),
+  {reply, jsx:encode(Info), Req, State};
+  
 info(Info, Req, State) ->
   io:format("Info Received: ~p~n", [Info]),
   {ok, Req, State}.
