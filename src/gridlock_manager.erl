@@ -8,6 +8,8 @@
   ,create_game/3
   ,game_list/1
   ,register/2
+  ,with_game/3
+  ,with_game/4
 ]).
 
 %% gen_server callbacks
@@ -31,6 +33,11 @@ create_game(Manager, Name, Size) when is_pid(Manager), is_binary(Name), is_integ
 
 game_list(Manager) ->
   gen_server:call(Manager, game_list).
+
+with_game(Manager, Game, Command) ->
+  gen_server:call(Manager, {with_game, Game, Command, []}).
+with_game(Manager, Game, Command, Args) ->
+  gen_server:call(Manager, {with_game, Game, Command, Args}).
 
 register(Manager, Pid) ->
   gen_server:call(Manager, {register, Pid}).
@@ -80,6 +87,11 @@ handle_call({create_game, GameData = #{name := Name, size := Size}}, _From, Stat
              notify_event(State, game_created, GameData),
              {reply, ok, State#{ grids := AddedGrid }}
   end;
+
+handle_call({with_game, Game, Command, Args}, _From, State = #{ grids := Grids }) ->
+  Grid = maps:get(Game, Grids),
+  Reply = erlang:apply(gridlock_game, Command, [Grid]++Args),
+  {reply, Reply, State};
 
 handle_call(game_list, _From, State = #{ grids := Grids }) ->
   {reply, maps:keys(Grids), State};

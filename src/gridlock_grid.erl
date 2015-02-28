@@ -12,7 +12,7 @@
 
 build(Size) ->
   DefaultSquare = #{has_bomb => false, status => covered, surrounding_bombs => 0, location => {0,0}},
-  ProtoMap = [{{X,Y}, DefaultSquare#{location := {X,Y}}} || X <- lists:seq(1,Size), Y <- lists:seq(1,Size)], 
+  ProtoMap = [{{X,Y}, DefaultSquare#{location := #{x=>X,y=>Y}}} || X <- lists:seq(1,Size), Y <- lists:seq(1,Size)], 
   #{size => Size, squares => maps:from_list(ProtoMap)}.
 
 square_at(#{squares := Grid}, Location) when is_map(Grid), is_tuple(Location) ->

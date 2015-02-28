@@ -5,6 +5,10 @@ new_test() ->
   Pid = gridlock_game:new(30),
   ?assertMatch(X when is_pid(X), Pid).
 
+size_test() ->
+  Game = gridlock_game:new(5),
+  ?assertMatch(5, gridlock_game:size(Game)).
+
 get_grid_test() ->
   Game = gridlock_game:new(30),
   ?assertMatch(900, length(gridlock_game:get_grid(Game))),
@@ -20,7 +24,7 @@ register_listener_test() ->
     after 10 ->
       nope
     end,
-  ?assertMatch({square_changed, #{ status := flagged, location := {1,1} }}, Msg).
+  ?assertMatch({square_changed, #{ status := flagged, location := _Loc }}, Msg).
 
 uncover_square_test() ->
   Game = gridlock_game:new(30),

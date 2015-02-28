@@ -50,5 +50,12 @@ handle_event(#{ event := <<"create_game">>, name := Name, size := Size}, Req, Ma
     {error, Reason} -> {reply, jsx:encode(#{event => <<"create_game_failed">>, reason => Reason}), Req, Manager}
   end;
 
+handle_event(#{ event := <<"draw_game">>, name := Name}, Req, Manager) ->
+  Msg = jsx:encode(#{ event => <<"draw_game">>,
+                      grid => gridlock_manager:with_game(Manager, Name, get_grid),
+                      size => gridlock_manager:with_game(Manager, Name, size)
+  }),
+  {reply, Msg, Req, Manager};
+
 handle_event(Unkown, Req, Manager) ->
   {reply, jsx:encode(#{ event => <<"invalid">>, data => Unkown}), Req, Manager}.

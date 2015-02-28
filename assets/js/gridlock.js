@@ -40,7 +40,10 @@ var grid_handler = {
     console.log('game created', data);
     if($('#new-grid-name').val() == data.name){
       $('#newGridModal').modal('hide');
+      bullet.send(JSON.stringify({ event: "draw_game", name: data.name}));
     }
-    $('#join-grid-list').append('<li><a href="#'+data.name+'">'+data.name+'</a></li>');
+    var link = $('<li><a href="#'+data.name+'">'+data.name+'</a></li>');
+    link.on('click', function(){ console.log("clicked :", data.name); });
+    $('#join-grid-list').append(link);
   }
 };

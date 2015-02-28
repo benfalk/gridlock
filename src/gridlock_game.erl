@@ -8,7 +8,8 @@
          register_listener/2,
          uncover_square/2,
          flag_square/2,
-         unflag_square/2
+         unflag_square/2,
+         size/1
 ]).
 
 %% gen_server callbacks
@@ -29,6 +30,9 @@ new(Size) ->
 
 get_grid(Game) ->
   gen_server:call(Game, get_grid).
+
+size(Game) ->
+  gen_server:call(Game, size).
 
 register_listener(Game, Pid) ->
   gen_server:call(Game, {register_listener, Pid}).
@@ -81,6 +85,10 @@ init(Size) ->
 handle_call(get_grid, _From, State = #{grid := Grid}) ->
   {reply, gridlock_grid:squares(Grid), State};
 
+handle_call(size, _From, State = #{grid := Grid}) ->
+  Size = maps:get(size, Grid),
+  {reply, Size, State};
+
 handle_call({register_listener, Pid}, _From, State = #{ event_handler := EH }) ->
   gridlock_listener:add_listener(EH, Pid),
   {reply, ok, State};
@@ -94,8 +102,9 @@ handle_call({update_square, Status, Location}, _From, State = #{grid := Grid}) -
     {error, Reason} -> {reply, {error, Reason}, State}
   end;
 
-handle_call(_Request, _From, State) ->
+handle_call(Request, _From, State) ->
     Reply = ok,
+    io:format("Unkown request: ~p~nState: ~p~n~n", [Request, State]),
     {reply, Reply, State}.
 
 %%--------------------------------------------------------------------
