@@ -10,7 +10,15 @@ $(function(){
       console.log('bullet: closed');
   };
   bullet.onmessage = function(e){
-      console.log(e.data);
+      if(e.data == "pong"){ return; }
+      var data = JSON.parse(e.data);
+      if(data.event && grid_handler[data.event]){
+        grid_handler[data.event](data);
+      }
+      else{
+        console.log("Unhandled msg");
+        console.log(data);
+      }
   };
   bullet.onheartbeat = function(){
       bullet.send('ping');
@@ -25,3 +33,14 @@ $(function(){
     bullet.send(build_event)
   });
 });
+
+var grid_handler = {
+  current_grid : '',
+  game_created : function(data){
+    console.log('game created', data);
+    if($('#new-grid-name').val() == data.name){
+      $('#newGridModal').modal('hide');
+    }
+    $('#join-grid-list').append('<li><a href="#'+data.name+'">'+data.name+'</a></li>');
+  }
+};
