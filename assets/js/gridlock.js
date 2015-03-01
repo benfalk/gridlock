@@ -16,8 +16,7 @@ $(function(){
         grid_handler[data.event](data);
       }
       else{
-        console.log("Unhandled msg");
-        console.log(data);
+        console.log("Unhandled msg: ", data);
       }
   };
   bullet.onheartbeat = function(){
@@ -36,6 +35,7 @@ $(function(){
 
 var grid_handler = {
   current_grid : '',
+
   game_created : function(data){
     console.log('game created', data);
     if($('#new-grid-name').val() == data.name){
@@ -45,5 +45,22 @@ var grid_handler = {
     var link = $('<li><a href="#'+data.name+'">'+data.name+'</a></li>');
     link.on('click', function(){ console.log("clicked :", data.name); });
     $('#join-grid-list').append(link);
+  },
+
+  draw_game : function(data){
+    console.log("Drawing grid: ", data);
+    var box = $('#grid-box'),
+        table = $('<table></table>');
+    box.empty();
+
+    for(i=1; i<=data.size; i++){
+      var row = $('<tr></tr>');
+      for(j=1; j <= data.size; j++){
+        var cell = $('<td class="x'+i+' y'+j+' square">?</td>');
+        row.append(cell);
+      }
+      table.append(row)
+    }
+    box.append(table);
   }
 };
