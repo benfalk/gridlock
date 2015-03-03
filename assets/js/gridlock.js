@@ -43,24 +43,51 @@ var grid_handler = {
       bullet.send(JSON.stringify({ event: "draw_game", name: data.name}));
     }
     var link = $('<li><a href="#'+data.name+'">'+data.name+'</a></li>');
-    link.on('click', function(){ console.log("clicked :", data.name); });
+    link.on('click', function(){
+      bullet.send(JSON.stringify({ event: "draw_game", name: data.name}));
+    });
     $('#join-grid-list').append(link);
   },
 
   draw_game : function(data){
     console.log("Drawing grid: ", data);
-    var box = $('#grid-box'),
-        table = $('<table></table>');
+    var box     = $('#grid-box'),
+        table   = $('<table></table>'),
+        grid_pt = 0;
+
     box.empty();
+    this.current_grid = data;
 
     for(i=1; i<=data.size; i++){
       var row = $('<tr></tr>');
       for(j=1; j <= data.size; j++){
-        var cell = $('<td class="x'+i+' y'+j+' square">?</td>');
+        var status = data.grid[grid_pt].status;
+        var bombs = data.grid[grid_pt].surrounding_bombs;
+        var has_bomb = data.grid[grid_pt].has_bomb;
+        var b_txt = has_bomb ? 'X' : bombs > 0 ? bombs : '';
+        var cell = $('<td class="x'+i+' y'+j+' square status-'+status+' bombs-'+bombs+'">'+b_txt+'</td>');
+        cell.data('square', data.grid[grid_pt]);
+        cell.on('click', function(){
+          var datum = $(this).data('square');
+          bullet.send(JSON.stringify({
+            event: 'uncover_square',
+            location: datum.location,
+            name: grid_handler.current_grid.name
+          }));
+        });
         row.append(cell);
+        grid_pt++;
       }
       table.append(row)
     }
     box.append(table);
+  },
+
+  uncover_square : function(data){
+    if(data.name != this.current_grid.name){ return; }
+    console.log("Going to uncover: ", data);
+    var square = $($('.x'+data.location.x+'.y'+data.location.y)[0]);
+    square.removeClass('status-covered');
+    square.addClass('status-uncovered');
   }
 };

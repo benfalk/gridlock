@@ -91,6 +91,7 @@ handle_call({create_game, GameData = #{name := Name, size := Size}}, _From, Stat
 handle_call({with_game, Game, Command, Args}, _From, State = #{ grids := Grids }) ->
   Grid = maps:get(Game, Grids),
   Reply = erlang:apply(gridlock_game, Command, [Grid]++Args),
+  global_event(Command, Game, Args, Reply, State),
   {reply, Reply, State};
 
 handle_call(game_list, _From, State = #{ grids := Grids }) ->
@@ -154,6 +155,11 @@ code_change(_OldVsn, State, _Extra) ->
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
+global_event(uncover_square, Game, [{X,Y}], ok, State) ->
+  notify_event(State, uncover_square, #{ name => Game, location => #{ x => X, y => Y}});
+
+global_event(_Command, _Game, _Args, _Reply, _State) -> nil.
+
 notify_event(State, EventName, Data) when is_map(Data), is_atom(EventName) ->
   notify(State, maps:put(event, EventName, Data)).
 
