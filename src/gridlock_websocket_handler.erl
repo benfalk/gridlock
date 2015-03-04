@@ -60,7 +60,12 @@ handle_event(#{ event := <<"draw_game">>, name := Name}, Req, Manager) ->
 
 handle_event(#{ event := <<"uncover_square">>, name := Name, location := Location}, Req, Manager) ->
   MappedLocation = { maps:get(x, Location), maps:get(y, Location) },
-  Result = gridlock_manager:with_game(Manager, Name, uncover_square, [MappedLocation]),
+  gridlock_manager:with_game(Manager, Name, uncover_square, [MappedLocation]),
+  {ok, Req, Manager};
+
+handle_event(#{ event := <<"flag_square">>, name := Name, location := Location}, Req, Manager) ->
+  MappedLocation = { maps:get(x, Location), maps:get(y, Location) },
+  gridlock_manager:with_game(Manager, Name, flag_square, [MappedLocation]),
   {ok, Req, Manager};
 
 handle_event(Unkown, Req, Manager) ->

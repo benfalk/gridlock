@@ -75,6 +75,25 @@ var grid_handler = {
             name: grid_handler.current_grid.name
           }));
         });
+        cell.on('contextmenu', function(){
+          var datum = $(this).data('square');
+          console.log("You right clicked", datum);
+          if($(this).hasClass('status-covered')){
+            bullet.send(JSON.stringify({
+              event: 'flag_square',
+              location: datum.location,
+              name: grid_handler.current_grid.name
+            }));
+          }
+          else if($(this).hasClass('status-flagged')){
+            bullet.send(JSON.stringify({
+              event: 'unflag_square',
+              location: datum.location,
+              name: grid_handler.current_grid.name
+            }));
+          }
+          return false;
+        });
         row.append(cell);
         grid_pt++;
       }
@@ -89,5 +108,13 @@ var grid_handler = {
     var square = $($('.x'+data.location.x+'.y'+data.location.y)[0]);
     square.removeClass('status-covered');
     square.addClass('status-uncovered');
+  },
+
+  flag_square : function(data){
+    if(data.name != this.current_grid.name){ return; }
+    console.log("Going to flag: ", data);
+    var square = $($('.x'+data.location.x+'.y'+data.location.y)[0]);
+    square.removeClass('status-covered');
+    square.addClass('status-flagged');
   }
 };

@@ -158,6 +158,9 @@ code_change(_OldVsn, State, _Extra) ->
 global_event(uncover_square, Game, [{X,Y}], ok, State) ->
   notify_event(State, uncover_square, #{ name => Game, location => #{ x => X, y => Y}});
 
+global_event(flag_square, Game, [{X,Y}], ok, State) ->
+  notify_event(State, flag_square, #{ name => Game, location => #{ x => X, y => Y}});
+
 global_event(_Command, _Game, _Args, _Reply, _State) -> nil.
 
 notify_event(State, EventName, Data) when is_map(Data), is_atom(EventName) ->
