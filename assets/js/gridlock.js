@@ -116,5 +116,13 @@ var grid_handler = {
     var square = $($('.x'+data.location.x+'.y'+data.location.y)[0]);
     square.removeClass('status-covered');
     square.addClass('status-flagged');
+  },
+
+  unflag_square : function(data){
+    if(data.name != this.current_grid.name){ return; }
+    console.log("Going to unflag: ", data);
+    var square = $($('.x'+data.location.x+'.y'+data.location.y)[0]);
+    square.removeClass('status-flagged');
+    square.addClass('status-covered');
   }
 };

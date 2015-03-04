@@ -68,5 +68,10 @@ handle_event(#{ event := <<"flag_square">>, name := Name, location := Location},
   gridlock_manager:with_game(Manager, Name, flag_square, [MappedLocation]),
   {ok, Req, Manager};
 
+handle_event(#{ event := <<"unflag_square">>, name := Name, location := Location}, Req, Manager) ->
+  MappedLocation = { maps:get(x, Location), maps:get(y, Location) },
+  gridlock_manager:with_game(Manager, Name, unflag_square, [MappedLocation]),
+  {ok, Req, Manager};
+
 handle_event(Unkown, Req, Manager) ->
   {reply, jsx:encode(#{ event => <<"invalid">>, data => Unkown}), Req, Manager}.
