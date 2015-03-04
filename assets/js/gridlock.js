@@ -1,7 +1,8 @@
 $(function(){
-  bullet = $.bullet('ws://localhost:8080/gridlock');
+  bullet = $.bullet('ws://'+window.location.hostname+':'+window.location.port+'/gridlock');
   bullet.onopen = function(){
       console.log('bullet: opened');
+      bullet.send(JSON.stringify({ event: "game_list" }));
   };
   bullet.ondisconnect = function(){
       console.log('bullet: disconnected');
@@ -35,6 +36,17 @@ $(function(){
 
 var grid_handler = {
   current_grid : '',
+
+  game_list : function(data) {
+    console.log("Populating games", data);
+    data.games.forEach(function(game){
+      var link = $('<li><a href="#'+game+'">'+game+'</a></li>');
+      link.on('click', function(){
+        bullet.send(JSON.stringify({ event: "draw_game", name: game}));
+      });
+      $('#join-grid-list').append(link);
+    });
+  },
 
   game_created : function(data){
     console.log('game created', data);

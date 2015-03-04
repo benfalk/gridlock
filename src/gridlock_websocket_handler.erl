@@ -58,6 +58,10 @@ handle_event(#{ event := <<"draw_game">>, name := Name}, Req, Manager) ->
   }),
   {reply, Msg, Req, Manager};
 
+handle_event(#{ event := <<"game_list">> }, Req, Manager) ->
+  Msg = jsx:encode(#{ event => <<"game_list">>, games => gridlock_manager:game_list(Manager) }),
+  {reply, Msg, Req, Manager};
+
 handle_event(#{ event := <<"uncover_square">>, name := Name, location := Location}, Req, Manager) ->
   MappedLocation = { maps:get(x, Location), maps:get(y, Location) },
   gridlock_manager:with_game(Manager, Name, uncover_square, [MappedLocation]),
