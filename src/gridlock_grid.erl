@@ -7,7 +7,8 @@
   plant_bombs/2,
   count_bombs/1,
   update_square/3,
-  squares/1
+  squares/1,
+  surrounding_cords/2
 ]).
 
 build(Size) ->
@@ -18,14 +19,17 @@ build(Size) ->
 square_at(#{squares := Grid}, Location) when is_map(Grid), is_tuple(Location) ->
   maps:get(Location, Grid).
 
-surrounding_locations(#{size := Size, squares := Grid}, {X,Y}) ->
-  Keys = [{X2,Y2} || X2 <- lists:seq(X-1,X+1),
-                     Y2 <- lists:seq(Y-1,Y+1),
-                     X2 > 0,
-                     X2 =< Size,
-                     Y2 > 0,
-                     Y2 =< Size] -- [{X,Y}],
+surrounding_locations(S = #{squares := Grid}, {X,Y}) ->
+  Keys = surrounding_cords(S, {X,Y}),
   maps:with(Keys, Grid).
+
+surrounding_cords(#{size := Size}, {X,Y}) ->
+  [{X2,Y2} || X2 <- lists:seq(X-1,X+1),
+              Y2 <- lists:seq(Y-1,Y+1),
+              X2 > 0,
+              X2 =< Size,
+              Y2 > 0,
+              Y2 =< Size] -- [{X,Y}].
 
 plant_bombs(Grid = #{size := Size, squares := Squares}, BombAmount) ->
   BombList = lists:duplicate(BombAmount, true) ++ lists:duplicate(Size*Size-BombAmount, false),

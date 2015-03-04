@@ -9,7 +9,9 @@
          uncover_square/2,
          flag_square/2,
          unflag_square/2,
-         size/1
+         size/1,
+         square_at/2,
+         surrounding_cords/2
 ]).
 
 %% gen_server callbacks
@@ -45,6 +47,12 @@ flag_square(Game, Location) ->
 
 unflag_square(Game, Location) ->
   gen_server:call(Game, {update_square, covered, Location}).
+
+square_at(Game, Location) ->
+  gen_server:call(Game, {square_at, Location}).
+
+surrounding_cords(Game, Location) ->
+  gen_server:call(Game, {surrounding_cords, Location}).
 
 %%%===================================================================
 %%% gen_server callbacks
@@ -84,6 +92,12 @@ init(Size) ->
 %%--------------------------------------------------------------------
 handle_call(get_grid, _From, State = #{grid := Grid}) ->
   {reply, gridlock_grid:squares(Grid), State};
+
+handle_call({square_at, {X,Y}}, _From, State = #{grid := Grid}) ->
+  {reply, gridlock_grid:square_at(Grid, {X,Y}), State};
+
+handle_call({surrounding_cords, {X,Y}}, _From, State = #{grid := Grid}) ->
+  {reply, gridlock_grid:surrounding_cords(Grid, {X,Y}), State};
 
 handle_call(size, _From, State = #{grid := Grid}) ->
   Size = maps:get(size, Grid),

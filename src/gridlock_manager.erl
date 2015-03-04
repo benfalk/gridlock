@@ -60,6 +60,7 @@ register(Manager, Pid) ->
 %%--------------------------------------------------------------------
 init(_State) ->
   {ok, EventListener} = gen_event:start_link(),
+  gen_event:add_handler(EventListener, gridlock_solver, [self()]),
   {ok, #{grids => #{}, event_listener => EventListener}}.
 
 %%--------------------------------------------------------------------
