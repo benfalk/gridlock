@@ -21,3 +21,7 @@
   background-color: #D9853B;
   color: transparent;
 }
+
+.has_bomb.status-uncovered {
+  background-color: #CC3300;
+}

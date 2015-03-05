@@ -76,8 +76,9 @@ var grid_handler = {
         var status = data.grid[grid_pt].status;
         var bombs = data.grid[grid_pt].surrounding_bombs;
         var has_bomb = data.grid[grid_pt].has_bomb;
+        var bomb_class = has_bomb ? 'has_bomb' : '';
         var b_txt = has_bomb ? 'X' : bombs > 0 ? bombs : '';
-        var cell = $('<td class="x'+i+' y'+j+' square status-'+status+' bombs-'+bombs+'">'+b_txt+'</td>');
+        var cell = $('<td class="'+bomb_class+' x'+i+' y'+j+' square status-'+status+' bombs-'+bombs+'">'+b_txt+'</td>');
         cell.data('square', data.grid[grid_pt]);
         cell.on('click', function(){
           var datum = $(this).data('square');
