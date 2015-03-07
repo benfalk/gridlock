@@ -51,6 +51,7 @@ update_square(Grid = #{ squares := Squares, size := Size }, Location = {X,Y}, St
   #{status := OrginalStatus} = square_at(Grid, Location),
   case {Status, OrginalStatus} of
     {_, uncovered} -> { error, cannot_change_uncovered };
+    {uncovered,flagged} -> { error, cannot_uncover_flagged };
                  _ -> Square = maps:put(status, Status, square_at(Grid, Location)),
                       { ok, Grid#{ squares := maps:put(Location, Square, Squares) } }
   end;
