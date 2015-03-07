@@ -1,7 +1,10 @@
 .square {
-  width: 25px;
-  height: 25px;
-  border: 1px solid #000;
+/*  width: 25px;
+  height: 25px;*/
+  border-left: 1px solid #cfcfcf;
+  border-top: 1px solid #cfcfcf;
+  border-right: 1px solid #808080;
+  border-bottom: 1px solid #808080;
   text-align: center;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -10,18 +13,69 @@
   -ms-user-select: none;
   user-select: none;
   cursor: default;
+  display: block;
+  float: left;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+.grid-row {
+  width: 100%;
 }
 
 .status-covered {
-  background-color: #868686;
+  background-color: #c0c0c0;
   color: transparent;
 }
 
 .status-flagged {
-  background-color: #D9853B;
+  background-color: #c0c0c0;
   color: transparent;
 }
 
-.has_bomb.status-uncovered {
-  background-color: #CC3300;
+.status-flagged:after  {
+  content: ' ';
+  display: block;
+  width: 0; 
+  height: 0; 
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent; 
+  border-right: 6px solid #CC3300; 
+  position: absolute;
+  left: 5px;
+  top: 3px;
 }
+
+.square.has_bomb.status-uncovered {
+  background-color: #CC3300;
+  color: #000;
+  font-size: 56px;
+  line-height: 19px;
+}
+
+.square.status-uncovered {
+  background-color: #DDDDDD;
+  border-left: 1px solid #808080;
+  border-top: 1px solid #808080;
+  border-right: none;
+  border-bottom: none;
+}
+
+.status-uncovered.bombs-1 {
+ color: #0000ff;
+}
+.status-uncovered.bombs-2 {
+ color: #008000;
+}
+.status-uncovered.bombs-3, .status-uncovered.bombs-4, .status-uncovered.bombs-5, .status-uncovered.bombs-6, .status-uncovered.bombs-7, .status-uncovered.bombs-8 {
+ color: #ff0000;
+}
+
+
+
+
+.navbar-default {
+  margin: 0;
+  box-shadow: none;
+}
+

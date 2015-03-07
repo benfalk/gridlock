@@ -28,7 +28,7 @@ $(function(){
     var build_event = JSON.stringify({
       event: "create_game",
       name: $('#new-grid-name').val(),
-      size: parseInt($('#new-grid-size').val())
+      size: parseInt($('input[name=size]:checked').val())
     });
     bullet.send(build_event)
   });
@@ -64,22 +64,24 @@ var grid_handler = {
   draw_game : function(data){
     console.log("Drawing grid: ", data);
     var box     = $('#grid-box'),
-        table   = $('<table></table>'),
+        table   = $('<div class="board"></div>'),
         grid_pt = 0;
 
     box.empty();
     this.current_grid = data;
 
     for(i=1; i<=data.size; i++){
-      var row = $('<tr></tr>');
+      var row = $('<div class="grid-row"></div>');
       for(j=1; j <= data.size; j++){
         var status = data.grid[grid_pt].status;
         var bombs = data.grid[grid_pt].surrounding_bombs;
         var has_bomb = data.grid[grid_pt].has_bomb;
         var bomb_class = has_bomb ? 'has_bomb' : '';
-        var b_txt = has_bomb ? 'X' : bombs > 0 ? bombs : '';
-        var cell = $('<td class="'+bomb_class+' x'+i+' y'+j+' square status-'+status+' bombs-'+bombs+'">'+b_txt+'</td>');
+        var b_txt = has_bomb ? '&bull;' : bombs > 0 ? bombs : '';
+        var cell = $('<div class="'+bomb_class+' x'+i+' y'+j+' square status-'+status+' bombs-'+bombs+'">'+b_txt+'</div>');
         cell.data('square', data.grid[grid_pt]);
+        cell.css({'width': (100/data.size)+'%', 'height': (($(document).height()-50) / data.size)})
+        console.log($(document).height())
         cell.on('click', function(){
           var datum = $(this).data('square');
           bullet.send(JSON.stringify({
