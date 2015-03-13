@@ -10,6 +10,7 @@
   ,register/2
   ,with_game/3
   ,with_game/4
+  ,end_game/2
 ]).
 
 %% gen_server callbacks
@@ -30,6 +31,9 @@ start() ->
 
 create_game(Manager, Name, Size) when is_pid(Manager), is_binary(Name), is_integer(Size) ->
   gen_server:call(Manager, {create_game, #{name => Name, size => Size}}).
+
+end_game(Manager, Name) when is_pid(Manager), is_binary(Name) ->
+  gen_server:call(Manager, {end_game, Name}).
 
 game_list(Manager) ->
   gen_server:call(Manager, game_list).
@@ -80,6 +84,15 @@ init(_State) ->
 handle_call({register, Pid}, _From, State = #{ event_listener := EventListener }) ->
   Val = gridlock_listener:add_listener(EventListener, Pid),
   {reply, Val, State};
+
+handle_call({end_game, Name}, _From, State = #{ grids := Grids }) ->
+  case maps:is_key(Name, Grids) of
+    false -> {reply, {error, no_game_to_stop}, State};
+    true -> Grid = maps:get(Name, Grids),
+            gridlock_game:stop(Grid),
+            notify_event(State, game_ended, #{ name => Name }),
+            {reply, ok, State#{ grids := maps:remove(Name, Grids) }}
+  end;
 
 handle_call({create_game, GameData = #{name := Name, size := Size}}, _From, State = #{ grids := Grids }) ->
   case maps:is_key(Name, Grids) of

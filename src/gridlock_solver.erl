@@ -56,6 +56,10 @@ handle_event(#{ event := uncover_square, location := Loc, name := Name}, Manager
   end,
   {ok, Manager};
 
+handle_event(#{ event := game_created, name := Name}, Manager) ->
+  io:format("Game ~p was created!~n", [Name]),
+  {ok, Manager};
+
 handle_event(Event, State) ->
     io:format("Solver got ~p~n", [Event]),
     {ok, State}.

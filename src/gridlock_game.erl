@@ -11,7 +11,8 @@
          unflag_square/2,
          size/1,
          square_at/2,
-         surrounding_cords/2
+         surrounding_cords/2,
+         stop/1
 ]).
 
 %% gen_server callbacks
@@ -32,6 +33,9 @@ new(Size) ->
 
 get_grid(Game) ->
   gen_server:call(Game, get_grid).
+
+stop(Game) ->
+  gen_server:call(Game, stop).
 
 size(Game) ->
   gen_server:call(Game, size).
@@ -92,6 +96,9 @@ init(Size) ->
 %%--------------------------------------------------------------------
 handle_call(get_grid, _From, State = #{grid := Grid}) ->
   {reply, gridlock_grid:squares(Grid), State};
+
+handle_call(stop, _From, State) ->
+  {stop, normal, shutdown_ok, State};
 
 handle_call({square_at, {X,Y}}, _From, State = #{grid := Grid}) ->
   {reply, gridlock_grid:square_at(Grid, {X,Y}), State};
