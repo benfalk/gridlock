@@ -57,7 +57,8 @@ handle_event(#{ event := uncover_square, location := Loc, name := Name}, Manager
   {ok, Manager};
 
 handle_event(#{ event := game_created, name := Name}, Manager) ->
-  io:format("Game ~p was created!~n", [Name]),
+  timer:apply_after(timer:hours(3), gridlock_manager, end_game, [Manager, Name]),
+  io:format("Game ~p was created, it will be automatically stopped in 3 hours~n", [Name]),
   {ok, Manager};
 
 handle_event(Event, State) ->

@@ -48,6 +48,11 @@ var grid_handler = {
     });
   },
 
+  game_ended : function(data) {
+    console.log("Game Ending", data);
+    // TODO: Kill dropdown link & game view if it is up
+  },
+
   game_created : function(data){
     console.log('game created', data);
     if($('#new-grid-name').val() == data.name){
@@ -81,7 +86,6 @@ var grid_handler = {
         var cell = $('<div class="'+bomb_class+' x'+i+' y'+j+' square status-'+status+' bombs-'+bombs+'">'+b_txt+'</div>');
         cell.data('square', data.grid[grid_pt]);
         cell.css({'width': (100/data.size)+'%', 'height': (($(document).height()-50) / data.size)})
-        console.log($(document).height())
         cell.on('click', function(){
           var datum = $(this).data('square');
           bullet.send(JSON.stringify({
