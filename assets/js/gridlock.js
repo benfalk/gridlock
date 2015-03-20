@@ -50,6 +50,9 @@ var grid_handler = {
 
   game_ended : function(data) {
     console.log("Game Ending", data);
+    if($('#new-grid-name').val() == data.name){
+      $('#grid-box').empty();
+    }
     // TODO: Kill dropdown link & game view if it is up
   },
 
